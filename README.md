@@ -1,7 +1,5 @@
 ##############################
-OrientDB JCA connector
-##############################
-# author Dumitru Ciubenco
+OrientDB JCA connector by Dumitru Ciubenco
 ##############################
 version 1.1.0-SNAPSHOT
 
