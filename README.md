@@ -1,8 +1,8 @@
-==============================
+##############################
 OrientDB JCA connector
-==============================
-= author Dumitru Ciubenco
-==============================
+##############################
+# author Dumitru Ciubenco
+##############################
 version 1.1.0-SNAPSHOT
 
 Features:
@@ -14,13 +14,13 @@ Tested only on JBoss 7.1.1
 
 Usage:
  1. Build the source code using maven
- 1. Deploy the orientdb-jca-connector-0.0.1-SNAPSHOT.rar to your jboss
+ 1. Deploy the orientdb-jca-connector-1.1.0-SNAPSHOT.rar to your jboss
  1. Add resource addapter definition in your standalone.xml
 <pre>
 <code>
 &lt;resource-adapter&gt;
   &lt;archive&gt;
-      orientdb-jca-connector-0.0.1-SNAPSHOT.rar
+      orientdb-jca-connector-1.1.0-SNAPSHOT.rar
   &lt;/archive&gt;
   &lt;transaction-support&gt;XATransaction&lt;/transaction-support&gt;
   &lt;connection-definitions&gt;
@@ -46,14 +46,14 @@ Usage:
 </code>
 </pre>
 
- 1. Add the deployment dependency to your(pom.xml if you are using maven) or to the MANIFEST.MF: deployment.orientdb-jca-connector-0.0.1-SNAPSHOT.rar
+ 1. Add the deployment dependency to your(pom.xml if you are using maven) or to the MANIFEST.MF: deployment.orientdb-jca-connector-1.1.0-SNAPSHOT.rar
  1. Add the dependency to your project:
 <pre>
 <code>
   	&lt;dependency&gt;
 			&lt;groupId&gt;org.grossbook&lt;/groupId&gt;
 			&lt;artifactId&gt;orientdb-jca-api&lt;/artifactId&gt;
-			&lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;
+			&lt;version&gt;1.1.0-SNAPSHOT&lt;/version&gt;
 		&lt;/dependency&gt;
 		&lt;dependency&gt;
 			&lt;groupId&gt;org.jboss.ironjacamar&lt;/groupId&gt;
