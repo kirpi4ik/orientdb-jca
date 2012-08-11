@@ -15,16 +15,41 @@
    See the License for the specific language governing permissions and
    limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.grossbook</groupId>
 	<artifactId>orientdb-jca-parent</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>${version.orientdb-jca}-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<modules>
 		<module>orientdb-jca-api</module>
 		<module>orientdb-jca-impl</module>
 		<module>orientdb-jca-connector</module>
 	</modules>
+	<properties>
+		<version.orientdb-jca>1.1.0</version.orientdb-jca>
+		<version.orientdb>1.1.0</version.orientdb>
+	</properties>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.jboss.ironjacamar</groupId>
+				<artifactId>ironjacamar-spec-api</artifactId>
+				<version>1.0.0.Final</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.orientechnologies</groupId>
+				<artifactId>orientdb-core</artifactId>
+				<version>${version.orientdb}</version>
+				<type>jar</type>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.javaee</groupId>
+				<artifactId>jboss-transaction-api</artifactId>
+				<version>1.0.1.GA</version>
+				<scope>provided</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>

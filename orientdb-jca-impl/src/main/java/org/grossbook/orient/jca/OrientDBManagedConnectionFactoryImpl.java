@@ -69,12 +69,12 @@ public class OrientDBManagedConnectionFactoryImpl implements OrientDBManagedConn
 	 */
 	public void start() {
 		// FIXME: Will be moved to standalone.xml as config property
-		databasePool = new OGraphDatabasePool(LOCAL_DATABASES_TEMP_ORIENTDB, "admin", "admin");
+		databasePool = new OGraphDatabasePool(connectionUrl, "admin", "admin");
 		databasePool.setup(3, 20);
 		try {
 			databasePool.acquire();
 		} catch (OStorageException notExist) {
-			(new OGraphDatabase(LOCAL_DATABASES_TEMP_ORIENTDB)).create();
+			(new OGraphDatabase(connectionUrl)).create();
 		}
 
 	}

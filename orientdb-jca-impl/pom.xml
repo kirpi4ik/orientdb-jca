@@ -21,7 +21,7 @@
 	<parent>
 		<groupId>org.grossbook</groupId>
 		<artifactId>orientdb-jca-parent</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>${version.orientdb-jca}-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>orientdb-jca-impl</artifactId>
@@ -30,25 +30,23 @@
 		<dependency>
 			<groupId>org.grossbook</groupId>
 			<artifactId>orientdb-jca-api</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${version.orientdb-jca}-SNAPSHOT</version>
 			<type>jar</type>
 		</dependency>
 		<dependency>
 			<groupId>com.orientechnologies</groupId>
 			<artifactId>orientdb-core</artifactId>
-			<version>1.1.0</version>
+			<version>${version.orientdb}</version>
 			<type>jar</type>
 		</dependency>
 		<dependency>
 			<groupId>org.jboss.ironjacamar</groupId>
 			<artifactId>ironjacamar-spec-api</artifactId>
-			<version>1.0.0.Final</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jboss.javaee</groupId>
 			<artifactId>jboss-transaction-api</artifactId>
-			<version>1.0.1.GA</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>

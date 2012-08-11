@@ -1,7 +1,9 @@
-orientdb-jca v. 0.0.1
-============
-
+==============================
 OrientDB JCA connector
+==============================
+= author Dumitru Ciubenco
+==============================
+version 1.1.0-SNAPSHOT
 
 Features:
 - OGraphDatabasePool support
