@@ -19,7 +19,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.grossbook</groupId>
 	<artifactId>orientdb-jca-parent</artifactId>
-	<version>${version.orientdb-jca}-SNAPSHOT</version>
+	<version>${version.orientdb-jca}</version>
 	<packaging>pom</packaging>
 	<modules>
 		<module>orientdb-jca-api</module>
@@ -27,7 +27,7 @@
 		<module>orientdb-jca-connector</module>
 	</modules>
 	<properties>
-		<version.orientdb-jca>1.1.0</version.orientdb-jca>
+		<version.orientdb-jca>1.1.0-SNAPSHOT</version.orientdb-jca>
 		<version.orientdb>1.1.0</version.orientdb>
 	</properties>
 	<dependencyManagement>
