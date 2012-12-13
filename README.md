@@ -22,7 +22,7 @@ Usage:
   &lt;/archive&gt;
   &lt;transaction-support&gt;XATransaction&lt;/transaction-support&gt;
   &lt;connection-definitions&gt;
-    &lt;connection-definition class-name=&quot;org.grossbook.orient.jca.OrientDBManagedConnectionFactoryImpl&quot; jndi-name=&quot;java:/jca/orientDb&quot; enabled=&quot;true&quot; use-java-context=&quot;true&quot; pool-name=&quot;orient-db-jca-pool&quot;&gt;
+    &lt;connection-definition class-name=&quot;eu.devexpert.orient.jca.OrientDBManagedConnectionFactoryImpl&quot; jndi-name=&quot;java:/jca/orientDb&quot; enabled=&quot;true&quot; use-java-context=&quot;true&quot; pool-name=&quot;orient-db-jca-pool&quot;&gt;
     &lt;config-property name=&quot;connectionUrl&quot;&gt;
         local:${jboss.server.config.dir}/orient-db/url
     &lt;/config-property&gt;
@@ -49,7 +49,7 @@ Usage:
 <pre>
 <code>
   	&lt;dependency&gt;
-			&lt;groupId&gt;org.grossbook&lt;/groupId&gt;
+			&lt;groupId&gt;eu.devexpert&lt;/groupId&gt;
 			&lt;artifactId&gt;orientdb-jca-api&lt;/artifactId&gt;
 			&lt;version&gt;1.1.0-SNAPSHOT&lt;/version&gt;
 		&lt;/dependency&gt;

@@ -1,25 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-   Licensed to the Apache Software Foundation (ASF) under one or more
-   contributor license agreements.  See the NOTICE file distributed with
-   this work for additional information regarding copyright ownership.
-   The ASF licenses this file to You under the Apache License, Version 2.0
-   (the "License"); you may not use this file except in compliance with
-   the License.  You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-  -->
+<!-- Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements. See the NOTICE file distributed with this work for additional information regarding 
+	copyright ownership. The ASF licenses this file to You under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may 
+	obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed 
+	on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the 
+	License. -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.grossbook</groupId>
+	<groupId>eu.devexpert</groupId>
 	<artifactId>orientdb-jca-parent</artifactId>
-	<version>${version.orientdb-jca}</version>
+	<version>1.2.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<modules>
 		<module>orientdb-jca-api</module>
@@ -27,9 +16,21 @@
 		<module>orientdb-jca-connector</module>
 	</modules>
 	<properties>
-		<version.orientdb-jca>1.1.0-SNAPSHOT</version.orientdb-jca>
-		<version.orientdb>1.1.0</version.orientdb>
+		<version.orientdb-jca>1.2.0-SNAPSHOT</version.orientdb-jca>
+		<version.orientdb>1.2.0</version.orientdb>
 	</properties>
+	<distributionManagement>
+		<repository>
+			<id>devexpert</id>
+			<name>RepositoryProxy</name>
+			<url>http://nexus.devexpert.eu/content/repositories/releases</url>
+		</repository>
+		<snapshotRepository>
+			<id>devexpert</id>
+			<name>RepositoryProxy</name>
+			<url>http://nexus.devexpert.eu/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -52,4 +53,38 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>2.5.1</version>
+					<configuration>
+						<source>1.7</source>
+						<target>1.7</target>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>devexpert</id>
+			<url>http://nexus.devexpert.eu/content/repositories/snapshots</url>
+		</pluginRepository>
+	</pluginRepositories>
+	<repositories>
+		<repository>
+			<id>devexpert</id>
+			<name>DevExpert.eu</name>
+			<url>http://nexus.devexpert.eu/content/repositories/public</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 </project>
