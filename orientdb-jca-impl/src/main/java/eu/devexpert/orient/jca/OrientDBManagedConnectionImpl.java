@@ -44,7 +44,7 @@ import eu.devexpert.orient.jca.api.OrientDBManagedConnectionFactory;
  * @created August 05, 2012
  */
 public class OrientDBManagedConnectionImpl implements ManagedConnection, OrientDBManagedConnection {
-	private static Logger						log	= Logger.getLogger("OrientDBManagedConnectionImpl");
+	private static Logger						log	= Logger.getLogger(OrientDBManagedConnectionImpl.class.getName());
 	/** MCF */
 	private OrientDBManagedConnectionFactory	mcf;
 	/** Log writer */
@@ -80,7 +80,7 @@ public class OrientDBManagedConnectionImpl implements ManagedConnection, OrientD
 	 */
 	private void sendEvent(int type, OrientDBConnection handle, Exception cause) {
 		ConnectionEvent event = new ConnectionEvent(this, type, cause);
-		if (handle != null) {
+		if(handle != null) {
 			event.setConnectionHandle(handle);
 		}
 
@@ -91,6 +91,7 @@ public class OrientDBManagedConnectionImpl implements ManagedConnection, OrientD
 	 * Send connection closed event.
 	 */
 	void sendClosedEvent(OrientDBConnection handle) {
+		log.info("send-event-close");
 		sendEvent(ConnectionEvent.CONNECTION_CLOSED, handle, null);
 	}
 
@@ -98,6 +99,7 @@ public class OrientDBManagedConnectionImpl implements ManagedConnection, OrientD
 	 * Send connection error event.
 	 */
 	void sendErrorEvent(OrientDBConnection handle, Exception cause) {
+		log.info("send-event-error");
 		sendEvent(ConnectionEvent.CONNECTION_ERROR_OCCURRED, handle, cause);
 	}
 
@@ -105,6 +107,7 @@ public class OrientDBManagedConnectionImpl implements ManagedConnection, OrientD
 	 * Send transaction committed event.
 	 */
 	void sendTxCommittedEvent(OrientDBConnection handle) {
+		log.info("send-event-tx-commited");
 		sendEvent(ConnectionEvent.LOCAL_TRANSACTION_COMMITTED, handle, null);
 	}
 
@@ -112,6 +115,7 @@ public class OrientDBManagedConnectionImpl implements ManagedConnection, OrientD
 	 * Send transaction rolledback event.
 	 */
 	void sendTxRolledbackEvent(OrientDBConnection handle) {
+		log.info("send-event-tx-rollback");
 		sendEvent(ConnectionEvent.LOCAL_TRANSACTION_ROLLEDBACK, handle, null);
 	}
 
@@ -119,6 +123,7 @@ public class OrientDBManagedConnectionImpl implements ManagedConnection, OrientD
 	 * Send transaction started event.
 	 */
 	void sendTxStartedEvent(OrientDBConnection handle) {
+		log.info("send-event-tx-started");
 		sendEvent(ConnectionEvent.LOCAL_TRANSACTION_STARTED, handle, null);
 	}
 
@@ -131,7 +136,7 @@ public class OrientDBManagedConnectionImpl implements ManagedConnection, OrientD
 	 */
 
 	public void closeHandle(OrientDBConnection handle) {
-		if (handle != null) {
+		if(handle != null) {
 			removeHandle(handle);
 			sendClosedEvent(handle);
 		}
@@ -141,6 +146,7 @@ public class OrientDBManagedConnectionImpl implements ManagedConnection, OrientD
 	 * Send event.
 	 */
 	private void sendEvent(ConnectionEvent event) {
+		log.info("JCA received event : " + event.getId());
 		synchronized(listeners) {
 			for(Iterator<ConnectionEventListener> i = listeners.iterator(); i.hasNext();) {
 				ConnectionEventListener listener = i.next();
@@ -196,7 +202,7 @@ public class OrientDBManagedConnectionImpl implements ManagedConnection, OrientD
 
 	public void associateConnection(Object connection) throws ResourceException {
 		OrientDBConnectionImpl handle = (OrientDBConnectionImpl) connection;
-		if (handle.getMc() != this) {
+		if(handle.getMc() != this) {
 			handle.getMc().removeHandle(handle);
 			handle.setMc(this);
 			addHandle(handle);
@@ -225,6 +231,7 @@ public class OrientDBManagedConnectionImpl implements ManagedConnection, OrientD
 			this.localTransaction = null;
 			this.handles.clear();
 		}
+		log.info("Cleanup managed connection resources");
 	}
 
 	/*
@@ -235,6 +242,7 @@ public class OrientDBManagedConnectionImpl implements ManagedConnection, OrientD
 	public void destroy() throws ResourceException {
 		cleanup();
 		mcf.destroyManagedConnection(this);
+		log.info("Destroy managed connection resources");
 	}
 
 	/*
@@ -244,7 +252,7 @@ public class OrientDBManagedConnectionImpl implements ManagedConnection, OrientD
 
 	public void addConnectionEventListener(ConnectionEventListener listener) {
 		synchronized(listeners) {
-			if (!listeners.contains(listener)) {
+			if(!listeners.contains(listener)) {
 				listeners.add(listener);
 			}
 		}
@@ -255,7 +263,7 @@ public class OrientDBManagedConnectionImpl implements ManagedConnection, OrientD
 	 * @see eu.devexpert.orient.jca.OrientDBManagedConnectionApi#removeConnectionEventListener(javax.resource.spi. ConnectionEventListener)
 	 */
 	public void removeConnectionEventListener(ConnectionEventListener listener) {
-		if (listener == null)
+		if(listener == null)
 			throw new IllegalArgumentException("Listener is null");
 		listeners.remove(listener);
 	}

@@ -28,9 +28,10 @@ import javax.resource.spi.ManagedConnectionMetaData;
  * @created August 05, 2012
  */
 public class OrientDBManagedConnectionMetaData implements ManagedConnectionMetaData {
-	private static Logger	log	= Logger.getLogger("OrientDBManagedConnectionMetaData");
+	private static Logger	log	= Logger.getLogger(OrientDBManagedConnectionMetaData.class.getName());
 
 	public OrientDBManagedConnectionMetaData() {
+		super();
 		log.info("constructor");
 	}
 
@@ -53,7 +54,7 @@ public class OrientDBManagedConnectionMetaData implements ManagedConnectionMetaD
 	 *             Thrown if an error occurs
 	 */
 	public String getEISProductVersion() throws ResourceException {
-		return "0.0.1-SNAPSHOT";
+		return "1.2.0-SNAPSHOT";
 	}
 
 	/**

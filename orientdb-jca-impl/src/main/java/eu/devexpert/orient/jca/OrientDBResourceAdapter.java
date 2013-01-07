@@ -40,7 +40,7 @@ import eu.devexpert.orient.jca.api.OrientDBManagedConnectionFactory;
  */
 @Connector(reauthenticationSupport = false, transactionSupport = TransactionSupport.TransactionSupportLevel.XATransaction)
 public class OrientDBResourceAdapter implements ResourceAdapter {
-	private static Logger								log			= Logger.getLogger(OrientDBResourceAdapter.class.getName());
+	private static Logger								logger		= Logger.getLogger(OrientDBResourceAdapter.class.getName());
 
 	private final Set<OrientDBManagedConnectionFactory>	factories	= new HashSet<OrientDBManagedConnectionFactory>();
 
@@ -55,7 +55,7 @@ public class OrientDBResourceAdapter implements ResourceAdapter {
 	 *             generic exception
 	 */
 	public void endpointActivation(MessageEndpointFactory endpointFactory, ActivationSpec spec) throws ResourceException {
-		log.info("endpointActivation()");
+		logger.info("endpointActivation()");
 	}
 
 	/**
@@ -67,7 +67,7 @@ public class OrientDBResourceAdapter implements ResourceAdapter {
 	 *            An activation spec JavaBean instance.
 	 */
 	public void endpointDeactivation(MessageEndpointFactory endpointFactory, ActivationSpec spec) {
-		log.info("endpointDeactivation()");
+		logger.info("endpointDeactivation()");
 	}
 
 	public void addFactory(OrientDBManagedConnectionFactory factory) {
@@ -78,21 +78,21 @@ public class OrientDBResourceAdapter implements ResourceAdapter {
 	 * * This method is called by the application server during crash recovery.
 	 */
 	public XAResource[] getXAResources(ActivationSpec[] arg0) throws ResourceException {
-		log.info("getXAResources()");
+		logger.info("getXAResources() which is null");
 		return null;
 	}
 
 	public void start(BootstrapContext arg0) throws ResourceAdapterInternalException {
-		log.info("start()");
 		for(OrientDBManagedConnectionFactory factory : factories) {
 			factory.start();
+			logger.info("ConnectionFactory was started");
 		}
 	}
 
 	public void stop() {
-		log.info("stop()");
 		for(OrientDBManagedConnectionFactory factory : factories) {
 			factory.stop();
+			logger.info("ConnectionFactory was sopped");
 		}
 	}
 

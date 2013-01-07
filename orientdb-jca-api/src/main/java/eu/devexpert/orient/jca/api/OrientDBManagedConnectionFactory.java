@@ -55,13 +55,11 @@ public interface OrientDBManagedConnectionFactory extends ManagedConnectionFacto
 
 	public PrintWriter getLogWriter() throws ResourceException;
 
-	public ManagedConnection matchManagedConnections(Set connectionSet, Subject subject, ConnectionRequestInfo cxRequestInfo) throws ResourceException;
+	public ManagedConnection matchManagedConnections(@SuppressWarnings("rawtypes") Set connectionSet, Subject subject, ConnectionRequestInfo cxRequestInfo) throws ResourceException;
 
 	public void setLogWriter(PrintWriter out) throws ResourceException;
 
 	public int hashCode();
-
-	public String getConnectionUrl();
 
 	public void setConnectionUrl(String connectionUrl);
 

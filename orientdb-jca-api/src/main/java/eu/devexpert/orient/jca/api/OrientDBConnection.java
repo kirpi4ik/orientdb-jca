@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.resource.ResourceException;
+
 import com.orientechnologies.orient.core.command.OCommandRequest;
 import com.orientechnologies.orient.core.db.ODatabase;
 import com.orientechnologies.orient.core.db.ODatabaseComplex;
@@ -334,4 +336,12 @@ public interface OrientDBConnection extends ODatabase {
 	public <RET extends List<?>> RET query(final OQuery<? extends Object> iCommand, final Object... iArgs);
 
 	public <RET extends OCommandRequest> RET command(OSQLSynchQuery<ODocument> osqlSynchQuery);
+
+	public ODocument getNodeById(String vertexClass, Long id) throws ResourceException;
+
+	public List<ODocument> getAllNodes(String vertexClass);
+
+	public ODocument persistNode(Object obj);
+
+	public <T> T getNodeById(Class<T> clazz, Long id) throws ResourceException;
 }

@@ -16,6 +16,7 @@
  */
 package eu.devexpert.orient.jca;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -25,10 +26,11 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
-import eu.devexpert.orient.jca.api.OrientDBConnection;
-import eu.devexpert.orient.jca.api.OrientDBManagedConnection;
-import eu.devexpert.orient.jca.api.OrientDBManagedConnectionFactory;
+import javax.resource.ResourceException;
 
+import org.json.JSONObject;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orientechnologies.orient.core.cache.OLevel1RecordCache;
 import com.orientechnologies.orient.core.cache.OLevel2RecordCache;
 import com.orientechnologies.orient.core.command.OCommandRequest;
@@ -52,6 +54,10 @@ import com.orientechnologies.orient.core.storage.OStorage;
 import com.orientechnologies.orient.core.storage.OStorage.CLUSTER_TYPE;
 import com.orientechnologies.orient.core.type.tree.OMVRBTreeRIDSet;
 
+import eu.devexpert.orient.jca.api.OrientDBConnection;
+import eu.devexpert.orient.jca.api.OrientDBManagedConnection;
+import eu.devexpert.orient.jca.api.OrientDBManagedConnectionFactory;
+
 /**
  * 
  * @author Dumitru Ciubenco
@@ -60,7 +66,7 @@ import com.orientechnologies.orient.core.type.tree.OMVRBTreeRIDSet;
  */
 public class OrientDBConnectionImpl implements OrientDBConnection {
 	/** The logger */
-	private static Logger						log	= Logger.getLogger("OrientDBConnectionImpl");
+	private static Logger						log	= Logger.getLogger(OrientDBConnectionImpl.class.getName());
 	/** ManagedConnection */
 	private OrientDBManagedConnection			mc;
 	/** ManagedConnectionFactory */
@@ -79,30 +85,30 @@ public class OrientDBConnectionImpl implements OrientDBConnection {
 	 * @param database
 	 */
 	public OrientDBConnectionImpl(OrientDBManagedConnection mc, OrientDBManagedConnectionFactory mcf, OGraphDatabase database) {
-		log.info("Create new connection: " + database.getName());
 		this.graphDatabase = database;
 		ODatabaseRecordThreadLocal.INSTANCE.set(this.graphDatabase);
 		this.mc = mc;
 		this.mcf = mcf;
+		log.info("New connection to the : " + database.getName());
 	}
 
 	/**
 	 * Close
 	 */
 	public void close() {
-		log.info("Close OrientDBConnection: " + graphDatabase.getName());
 		graphDatabase.close();
 		mc.closeHandle(this);
+		log.info("Closed connection to the : " + graphDatabase.getName());
 	}
 
 	public void reload() {
-		log.info("Reload OrientDBConnection");
+		log.info("Reload connection to the : " + graphDatabase.getName());
 		graphDatabase.reload();
 
 	}
 
 	public void drop() {
-		log.info("Drop OrientDBConnection");
+		log.info("Drop connection to the : " + graphDatabase.getName());
 		graphDatabase.drop();
 
 	}
@@ -524,10 +530,12 @@ public class OrientDBConnectionImpl implements OrientDBConnection {
 	}
 
 	public ODatabaseComplex<ORecordInternal<?>> commit() {
+		log.info("Commit chamges");
 		return graphDatabase.commit();
 	}
 
 	public ODatabaseComplex<ORecordInternal<?>> rollback() {
+		log.info("Rollback chamges");
 		return graphDatabase.rollback();
 	}
 
@@ -553,5 +561,32 @@ public class OrientDBConnectionImpl implements OrientDBConnection {
 
 	public <RET extends OCommandRequest> RET command(OSQLSynchQuery<ODocument> osqlSynchQuery) {
 		return graphDatabase.command(osqlSynchQuery);
+	}
+
+	public ODocument getNodeById(String vertexClass, Long id) throws ResourceException {
+		List<ODocument> result = (List<ODocument>) graphDatabase.command(new OSQLSynchQuery<ODocument>("select * from ? where id = ?")).execute(vertexClass, id);
+		if(result.size() > 0) {
+			return result.get(0);
+		}else {
+			return null;
+		}
+	}
+
+	public List<ODocument> getAllNodes(String vertexClass) {
+		return (List<ODocument>) graphDatabase.command(new OSQLSynchQuery<ODocument>("select * from " + vertexClass)).execute();
+	}
+
+	public <T> T getNodeById(Class<T> clazz, Long id) throws ResourceException {
+		try {
+			return (new ObjectMapper()).readValue(getNodeById(clazz.getName(), id).toJSON(), clazz);
+		}
+		catch(IOException e) {
+			throw new ResourceException();
+		}
+	}
+
+	public ODocument persistNode(Object obj) {
+		ODocument node = createVertex(obj.getClass().getName());
+		return node.fromJSON((new JSONObject(obj)).toString()).save();
 	}
 }

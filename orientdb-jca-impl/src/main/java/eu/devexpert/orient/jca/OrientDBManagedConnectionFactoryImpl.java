@@ -19,6 +19,7 @@ package eu.devexpert.orient.jca;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.resource.ResourceException;
 import javax.resource.spi.ConfigProperty;
@@ -45,19 +46,24 @@ import com.orientechnologies.orient.core.exception.OStorageException;
  * @created August 05, 2012
  */
 @ConnectionDefinition(
-	connectionFactory = OrientDBConnectionFactory.class, connectionFactoryImpl = OrientDBConnectionFactoryImpl.class, connection = OrientDBConnection.class,
+	connectionFactory = OrientDBConnectionFactory.class, 
+	connectionFactoryImpl = OrientDBConnectionFactoryImpl.class, 
+	connection = OrientDBConnection.class,
 	connectionImpl = OrientDBConnectionImpl.class)
 public class OrientDBManagedConnectionFactoryImpl implements OrientDBManagedConnectionFactory {
-	private static final String		LOCAL_DATABASES_TEMP_ORIENTDB	= "local:../databases/temp-orientdb";
-	private static final long		serialVersionUID				= 1L;
-	/** The resource adapter */
+	private static final long		serialVersionUID	= 1L;
+	private static Logger			logger				= Logger.getLogger(OrientDBManagedConnectionFactoryImpl.class.getName());
 	private OrientDBResourceAdapter	ra;
 	private PrintWriter				logwriter;
-	@ConfigProperty(type = String.class, defaultValue = LOCAL_DATABASES_TEMP_ORIENTDB)
+	@ConfigProperty(type = String.class, defaultValue = "local:../databases/temp-orientdb")
 	private String					connectionUrl;
+	@ConfigProperty(type = String.class, defaultValue = "admin")
+	private String					username;
+	@ConfigProperty(type = String.class, defaultValue = "admin")
+	private String					password;
 	@ConfigProperty(defaultValue = "true")
 	private boolean					xa;
-	private int						connectionsCreated				= 0;
+	private int						connectionsCreated	= 0;
 	private OGraphDatabasePool		databasePool;
 
 	public OrientDBManagedConnectionFactoryImpl() {
@@ -69,16 +75,16 @@ public class OrientDBManagedConnectionFactoryImpl implements OrientDBManagedConn
 	 * @see eu.devexpert.orient.jca.OrientDBManagedConnectionFactory#start()
 	 */
 	public void start() {
-		// FIXME: Will be moved to standalone.xml as config property
-		databasePool = new OGraphDatabasePool(connectionUrl, "admin", "admin");
+		databasePool = new OGraphDatabasePool(connectionUrl, username, password);
 		databasePool.setup(3, 20);
 		try {
 			databasePool.acquire();
 		}
 		catch(OStorageException notExist) {
 			(new OGraphDatabase(connectionUrl)).create();
+			notExist.printStackTrace();
 		}
-
+		logger.info("Database pool acquired");
 	}
 
 	/*
@@ -87,6 +93,7 @@ public class OrientDBManagedConnectionFactoryImpl implements OrientDBManagedConn
 	 */
 	public void stop() {
 		databasePool.close();
+		logger.info("Database pool closed");
 	}
 
 	private OGraphDatabase getDatabase() {
@@ -98,9 +105,10 @@ public class OrientDBManagedConnectionFactoryImpl implements OrientDBManagedConn
 	 * @see eu.devexpert.orient.jca.OrientDBManagedConnectionFactory#getTransactionSupport()
 	 */
 	public TransactionSupportLevel getTransactionSupport() {
-		if (isXa()) {
+		logger.info("Transaction support XA is : " + isXa());
+		if(isXa()) {
 			return TransactionSupportLevel.XATransaction;
-		} else {
+		}else {
 			return TransactionSupportLevel.LocalTransaction;
 		}
 	}
@@ -152,7 +160,7 @@ public class OrientDBManagedConnectionFactoryImpl implements OrientDBManagedConn
 	 * @see eu.devexpert.orient.jca.OrientDBManagedConnectionFactory#getLogWriter()
 	 */
 	public PrintWriter getLogWriter() throws ResourceException {
-		logwriter.append("getLogWriter()");
+		logger.info("getLogWriter()");
 		return logwriter;
 	}
 
@@ -162,12 +170,12 @@ public class OrientDBManagedConnectionFactoryImpl implements OrientDBManagedConn
 	 */
 	@SuppressWarnings("unchecked")
 	public ManagedConnection matchManagedConnections(@SuppressWarnings("rawtypes") Set connectionSet, Subject subject, ConnectionRequestInfo cxRequestInfo) throws ResourceException {
-		logwriter.append("matchManagedConnections()");
+		logger.info("matchManagedConnections()");
 		ManagedConnection result = null;
 		Iterator<ManagedConnection> it = connectionSet.iterator();
 		while(result == null && it.hasNext()) {
 			ManagedConnection mc = it.next();
-			if (mc instanceof OrientDBManagedConnectionImpl) {
+			if(mc instanceof OrientDBManagedConnectionImpl) {
 				result = mc;
 			}
 
@@ -180,7 +188,7 @@ public class OrientDBManagedConnectionFactoryImpl implements OrientDBManagedConn
 	 * @see eu.devexpert.orient.jca.OrientDBManagedConnectionFactory#setLogWriter(java.io.PrintWriter)
 	 */
 	public void setLogWriter(PrintWriter out) throws ResourceException {
-		logwriter.append("setLogWriter()");
+		logger.info("setLogWriter()");
 		logwriter = out;
 
 	}
@@ -195,14 +203,6 @@ public class OrientDBManagedConnectionFactoryImpl implements OrientDBManagedConn
 		int result = 1;
 		result = prime * result + ((ra == null) ? 0 : ra.hashCode());
 		return result;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see eu.devexpert.orient.jca.OrientDBManagedConnectionFactory#getConnectionUrl()
-	 */
-	public String getConnectionUrl() {
-		return connectionUrl;
 	}
 
 	/*
@@ -229,19 +229,27 @@ public class OrientDBManagedConnectionFactoryImpl implements OrientDBManagedConn
 		this.xa = xa;
 	}
 
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see eu.devexpert.orient.jca.OrientDBManagedConnectionFactory#equals(java.lang.Object)
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if(this == obj)
 			return true;
-		if (obj == null)
+		if(obj == null)
 			return false;
-		if (getClass() != obj.getClass())
+		if(getClass() != obj.getClass())
 			return false;
-		if (obj instanceof OrientDBManagedConnectionFactory) {
+		if(obj instanceof OrientDBManagedConnectionFactory) {
 			return true;
 		}
 		return false;
@@ -253,8 +261,8 @@ public class OrientDBManagedConnectionFactoryImpl implements OrientDBManagedConn
 	 */
 	public void destroyManagedConnection(OrientDBManagedConnection orientDBManagedConnection) {
 		connectionsCreated--;
-		if (connectionsCreated <= 0) {
-			// shutdown database
+		if(connectionsCreated <= 0) {
+			logger.info("Shutdown database!");
 		}
 	}
 

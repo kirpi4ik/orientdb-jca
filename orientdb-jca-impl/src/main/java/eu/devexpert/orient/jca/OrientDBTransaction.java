@@ -16,6 +16,8 @@
  */
 package eu.devexpert.orient.jca;
 
+import java.util.logging.Logger;
+
 import javax.resource.ResourceException;
 import javax.resource.spi.LocalTransaction;
 
@@ -30,6 +32,7 @@ import com.orientechnologies.orient.core.tx.OTransaction;
 public class OrientDBTransaction implements LocalTransaction {
 	private OTransaction					transaction;
 	private OrientDBManagedConnectionImpl	orientDBManagedConnection;
+	private static Logger					logger	= Logger.getLogger(OrientDBTransaction.class.getName());
 
 	public OrientDBTransaction(OrientDBManagedConnectionImpl mc, OTransaction transaction) {
 		this.orientDBManagedConnection = mc;
@@ -41,10 +44,13 @@ public class OrientDBTransaction implements LocalTransaction {
 	}
 
 	public void rollback() throws ResourceException {
-		if (null != transaction) {
+		if(null != transaction) {
 			transaction.rollback();
 			finish();
 			orientDBManagedConnection.sendTxRolledbackEvent(null);
+			logger.info("Rollback transaction");
+		}else {
+			logger.warning("Rollback: Transaction is null");
 		}
 	}
 
@@ -53,15 +59,23 @@ public class OrientDBTransaction implements LocalTransaction {
 	}
 
 	public void commit() throws ResourceException {
-		if (null != transaction) {
+		if(null != transaction) {
 			transaction.commit();
 			finish();
 			orientDBManagedConnection.sendTxCommittedEvent(null);
+			logger.info("Commit transaction");
+		}else {
+			logger.warning("Commit: Transaction is null");
 		}
 	}
 
 	public void begin() throws ResourceException {
-		transaction.begin();
-		orientDBManagedConnection.sendTxStartedEvent(null);
+		if(null != transaction) {
+			transaction.begin();
+			orientDBManagedConnection.sendTxStartedEvent(null);
+			logger.info("Begin transaction");
+		}else {
+			logger.warning("Begin transaction: Transaction is null");
+		}
 	}
 }

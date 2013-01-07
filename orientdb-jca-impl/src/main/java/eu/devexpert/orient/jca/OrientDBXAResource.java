@@ -17,6 +17,7 @@
 package eu.devexpert.orient.jca;
 
 import java.io.Serializable;
+import java.util.logging.Logger;
 
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
@@ -32,6 +33,7 @@ import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
  */
 public class OrientDBXAResource implements XAResource, Serializable {
 	private static final long				serialVersionUID	= 1L;
+	private static Logger					logger				= Logger.getLogger(OrientDBXAResource.class.getName());
 	private int								timeout;
 	private OGraphDatabase					database;
 	private OrientDBManagedConnectionImpl	connection;
@@ -40,18 +42,24 @@ public class OrientDBXAResource implements XAResource, Serializable {
 	public OrientDBXAResource(OrientDBManagedConnectionImpl orientDBManagedConnection, OGraphDatabase oGraphDatabase) {
 		this.database = oGraphDatabase;
 		this.connection = orientDBManagedConnection;
+		logger.info("Graph DBXA resource instantiated");
 	}
 
 	public void commit(Xid arg0, boolean arg1) throws XAException {
 		database.commit();
+		logger.info("xa commit");
 	}
 
 	public void end(Xid arg0, int arg1) throws XAException {
-		if (!ending) {
+
+		if(!ending) {
 			this.ending = true;
 			try {
+				logger.info("xa end : " + ending);
 				database.getTransaction().close();
-			} finally {
+			}
+			finally {
+				logger.info("xa close");
 				connection.closeHandles();
 			}
 			this.ending = false;
@@ -60,7 +68,7 @@ public class OrientDBXAResource implements XAResource, Serializable {
 	}
 
 	public void forget(Xid arg0) throws XAException {
-
+		logger.info("xa forget");
 	}
 
 	public int getTransactionTimeout() throws XAException {
@@ -81,6 +89,7 @@ public class OrientDBXAResource implements XAResource, Serializable {
 
 	public void rollback(Xid arg0) throws XAException {
 		database.rollback();
+		logger.info("xa rollback");
 	}
 
 	public boolean setTransactionTimeout(int arg0) throws XAException {
@@ -90,6 +99,7 @@ public class OrientDBXAResource implements XAResource, Serializable {
 
 	public void start(Xid arg0, int arg1) throws XAException {
 		database.begin();
+		logger.info("xa begin transaction");
 	}
 
 }

@@ -16,6 +16,8 @@
  */
 package eu.devexpert.orient.jca;
 
+import java.util.logging.Logger;
+
 import javax.naming.NamingException;
 import javax.naming.Reference;
 import javax.resource.ResourceException;
@@ -33,23 +35,24 @@ import eu.devexpert.orient.jca.api.OrientDBManagedConnectionFactory;
  */
 public class OrientDBConnectionFactoryImpl implements OrientDBConnectionFactory {
 	private static final long					serialVersionUID	= 1L;
+	private static Logger						logger				= Logger.getLogger(OrientDBConnectionFactoryImpl.class.getName());
 	private Reference							reference;
 	private OrientDBManagedConnectionFactory	mcf;
-	private ConnectionManager					connectionManager;
-	private OrientDBConnection					connection;
+	private ConnectionManager					txConnectionManager;
 
 	/**
 	 * Default constructor
 	 * 
 	 * @param mcf
-	 *            ManagedConnectionFactory
+	 *            ManagedConnectionFactory - E.g: OrientDBManagedConnectionFactoryImpl
 	 * 
 	 * @param cxManager
-	 *            ConnectionManager
+	 *            ConnectionManager (E.g: for JBoss7 it will be org.jboss.jca.core.connectionmanager.tx.TxConnectionManagerImpl)
 	 */
 	public OrientDBConnectionFactoryImpl(OrientDBManagedConnectionFactory mcf, ConnectionManager cxManager) {
 		this.mcf = mcf;
-		this.connectionManager = cxManager;
+		this.txConnectionManager = cxManager;
+		logger.info("OrientDBConnectionFactoryImpl instantiated.");
 	}
 
 	/**
@@ -61,8 +64,8 @@ public class OrientDBConnectionFactoryImpl implements OrientDBConnectionFactory 
 	 *                Thrown if a connection can't be obtained
 	 */
 	public OrientDBConnection getConnection() throws ResourceException {
-		connection = (OrientDBConnection) connectionManager.allocateConnection(mcf, null);
-		return connection;
+		logger.info("Get connection from ");
+		return (OrientDBConnection) txConnectionManager.allocateConnection(mcf, null);
 	}
 
 	/**
