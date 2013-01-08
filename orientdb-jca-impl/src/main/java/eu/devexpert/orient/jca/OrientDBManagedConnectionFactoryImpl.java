@@ -150,7 +150,7 @@ public class OrientDBManagedConnectionFactoryImpl implements OrientDBManagedConn
 	 * (non-Javadoc)
 	 * @see eu.devexpert.orient.jca.OrientDBManagedConnectionFactory#createManagedConnection(javax.security.auth.Subject, javax.resource.spi.ConnectionRequestInfo)
 	 */
-	public ManagedConnection createManagedConnection(Subject arg0, ConnectionRequestInfo arg1) throws ResourceException {
+	public ManagedConnection createManagedConnection(Subject subject, ConnectionRequestInfo cri) throws ResourceException {
 		connectionsCreated++;
 		return new OrientDBManagedConnectionImpl(this, getDatabase());
 	}

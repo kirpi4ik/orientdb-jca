@@ -16,7 +16,9 @@
  */
 package eu.devexpert.orient.jca;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -38,7 +40,9 @@ import eu.devexpert.orient.jca.api.OrientDBManagedConnectionFactory;
  * @since 0.0.1
  * @created August 05, 2012
  */
-@Connector(reauthenticationSupport = false, transactionSupport = TransactionSupport.TransactionSupportLevel.XATransaction)
+@Connector(
+	reauthenticationSupport = false, transactionSupport = TransactionSupport.TransactionSupportLevel.XATransaction, version = "1.2.0", vendorName = "eu.devexpert",
+	eisType = "OrientDB graph database")
 public class OrientDBResourceAdapter implements ResourceAdapter {
 	private static Logger								logger		= Logger.getLogger(OrientDBResourceAdapter.class.getName());
 
@@ -55,7 +59,7 @@ public class OrientDBResourceAdapter implements ResourceAdapter {
 	 *             generic exception
 	 */
 	public void endpointActivation(MessageEndpointFactory endpointFactory, ActivationSpec spec) throws ResourceException {
-		logger.info("endpointActivation()");
+		logger.info("Resource endpoint activation");
 	}
 
 	/**
@@ -67,7 +71,7 @@ public class OrientDBResourceAdapter implements ResourceAdapter {
 	 *            An activation spec JavaBean instance.
 	 */
 	public void endpointDeactivation(MessageEndpointFactory endpointFactory, ActivationSpec spec) {
-		logger.info("endpointDeactivation()");
+		logger.info("Resource endpoint deactivation");
 	}
 
 	public void addFactory(OrientDBManagedConnectionFactory factory) {
@@ -78,7 +82,7 @@ public class OrientDBResourceAdapter implements ResourceAdapter {
 	 * * This method is called by the application server during crash recovery.
 	 */
 	public XAResource[] getXAResources(ActivationSpec[] arg0) throws ResourceException {
-		logger.info("getXAResources() which is null");
+		logger.info("Get XA resource endpoint during crash recovery");
 		return null;
 	}
 

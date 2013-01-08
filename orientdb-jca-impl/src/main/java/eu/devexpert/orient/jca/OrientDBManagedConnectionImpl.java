@@ -53,7 +53,7 @@ public class OrientDBManagedConnectionImpl implements ManagedConnection, OrientD
 	private LinkedList<ConnectionEventListener>	listeners;
 	private LinkedList<OrientDBConnection>		handles;
 	/** Connection */
-	private OrientDBXAResource					xaResource;
+	private OrientDBTransactionXA				xaResource;
 	private LocalTransaction					localTransaction;
 	private OGraphDatabase						database;
 
@@ -71,8 +71,8 @@ public class OrientDBManagedConnectionImpl implements ManagedConnection, OrientD
 		this.database = oGraphDatabase;
 		this.listeners = new LinkedList<ConnectionEventListener>();
 		this.handles = new LinkedList<OrientDBConnection>();
-		this.xaResource = new OrientDBXAResource(this, oGraphDatabase);
-		this.localTransaction = new OrientDBTransaction(this, database.getTransaction());
+		this.xaResource = new OrientDBTransactionXA(this, this.database);
+		this.localTransaction = new OrientDBTransactionLocal(this, database.getTransaction());
 	}
 
 	/**
@@ -201,13 +201,13 @@ public class OrientDBManagedConnectionImpl implements ManagedConnection, OrientD
 	 */
 
 	public void associateConnection(Object connection) throws ResourceException {
-		OrientDBConnectionImpl handle = (OrientDBConnectionImpl) connection;
+		OrientDBConnection handle = (OrientDBConnection) connection;
 		if(handle.getMc() != this) {
 			handle.getMc().removeHandle(handle);
 			handle.setMc(this);
 			addHandle(handle);
 		}
-		System.out.println("associateConnection()");
+		log.info("associateConnection()");
 	}
 
 	public void addHandle(OrientDBConnection handle) {

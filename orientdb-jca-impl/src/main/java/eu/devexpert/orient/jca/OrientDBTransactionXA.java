@@ -31,38 +31,62 @@ import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
  * @since 0.0.1
  * @created August 05, 2012
  */
-public class OrientDBXAResource implements XAResource, Serializable {
+public class OrientDBTransactionXA implements XAResource, Serializable {
 	private static final long				serialVersionUID	= 1L;
-	private static Logger					logger				= Logger.getLogger(OrientDBXAResource.class.getName());
+	private static Logger					logger				= Logger.getLogger(OrientDBTransactionXA.class.getName());
 	private int								timeout;
 	private OGraphDatabase					database;
 	private OrientDBManagedConnectionImpl	connection;
-	private boolean							ending;
 
-	public OrientDBXAResource(OrientDBManagedConnectionImpl orientDBManagedConnection, OGraphDatabase oGraphDatabase) {
+	public OrientDBTransactionXA(final OrientDBManagedConnectionImpl orientDBManagedConnection, final OGraphDatabase oGraphDatabase) {
 		this.database = oGraphDatabase;
 		this.connection = orientDBManagedConnection;
 		logger.info("Graph DBXA resource instantiated");
 	}
 
-	public void commit(Xid arg0, boolean arg1) throws XAException {
+	public void start(final Xid xid, final int flags) throws XAException {
+		boolean tmJoin = (flags & XAResource.TMJOIN) != 0;
+		boolean tmResume = (flags & XAResource.TMRESUME) != 0;
+		/* Check flags - only one of TMNOFLAGS, TMJOIN, or TMRESUME. */
+		if(xid == null || (tmJoin && tmResume) || (!tmJoin && !tmResume && flags != XAResource.TMNOFLAGS)) {
+			throw new XAException(XAException.XAER_INVAL);
+		}
+		database.begin();
+		logger.info("xa begin");
+	}
+
+	public void commit(Xid xid, boolean ignore/* onePhase */) throws XAException {
+		if(xid == null) {
+			return;
+		}
 		database.commit();
 		logger.info("xa commit");
 	}
 
-	public void end(Xid arg0, int arg1) throws XAException {
+	public void rollback(Xid arg0) throws XAException {
+		database.rollback();
+		logger.info("xa rollback");
+	}
 
-		if(!ending) {
-			this.ending = true;
+	public void end(Xid arg0, int flags) throws XAException {
+
+		/* flags - One of TMSUCCESS, TMFAIL, or TMSUSPEND. */
+
+		boolean tmFail = (flags & XAResource.TMFAIL) != 0;
+		boolean tmSuccess = (flags & XAResource.TMSUCCESS) != 0;
+		boolean tmSuspend = (flags & XAResource.TMSUSPEND) != 0;
+		if((tmFail && tmSuccess) || ((tmFail || tmSuccess) && tmSuspend)) {
+			throw new XAException(XAException.XAER_INVAL);
+		}
+
+		if(tmSuspend && database.getTransaction() != null) {
 			try {
-				logger.info("xa end : " + ending);
 				database.getTransaction().close();
 			}
 			finally {
 				logger.info("xa close");
 				connection.closeHandles();
 			}
-			this.ending = false;
 		}
 
 	}
@@ -79,27 +103,17 @@ public class OrientDBXAResource implements XAResource, Serializable {
 		return this == arg0;
 	}
 
-	public int prepare(Xid arg0) throws XAException {
+	public int prepare(Xid xid) throws XAException {
 		return XA_OK;
 	}
 
-	public Xid[] recover(int arg0) throws XAException {
+	public Xid[] recover(int flag) throws XAException {
 		return new Xid[0];
 	}
 
-	public void rollback(Xid arg0) throws XAException {
-		database.rollback();
-		logger.info("xa rollback");
-	}
-
-	public boolean setTransactionTimeout(int arg0) throws XAException {
-		this.timeout = arg0;
+	public boolean setTransactionTimeout(int timeout) throws XAException {
+		this.timeout = timeout;
 		return true;
-	}
-
-	public void start(Xid arg0, int arg1) throws XAException {
-		database.begin();
-		logger.info("xa begin transaction");
 	}
 
 }

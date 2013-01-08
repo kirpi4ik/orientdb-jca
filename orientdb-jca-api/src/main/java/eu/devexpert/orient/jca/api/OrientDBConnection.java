@@ -344,4 +344,6 @@ public interface OrientDBConnection extends ODatabase {
 	public ODocument persistNode(Object obj);
 
 	public <T> T getNodeById(Class<T> clazz, Long id) throws ResourceException;
+
+	public abstract ODocument saveNode(Object obj) throws ResourceException;
 }

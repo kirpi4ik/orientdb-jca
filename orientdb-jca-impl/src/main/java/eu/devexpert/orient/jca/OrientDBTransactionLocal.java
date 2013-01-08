@@ -29,12 +29,12 @@ import com.orientechnologies.orient.core.tx.OTransaction;
  * @since 0.0.1
  * @created August 05, 2012
  */
-public class OrientDBTransaction implements LocalTransaction {
+public class OrientDBTransactionLocal implements LocalTransaction {
 	private OTransaction					transaction;
 	private OrientDBManagedConnectionImpl	orientDBManagedConnection;
-	private static Logger					logger	= Logger.getLogger(OrientDBTransaction.class.getName());
+	private static Logger					logger	= Logger.getLogger(OrientDBTransactionLocal.class.getName());
 
-	public OrientDBTransaction(OrientDBManagedConnectionImpl mc, OTransaction transaction) {
+	public OrientDBTransactionLocal(OrientDBManagedConnectionImpl mc, OTransaction transaction) {
 		this.orientDBManagedConnection = mc;
 		this.transaction = transaction;
 	}

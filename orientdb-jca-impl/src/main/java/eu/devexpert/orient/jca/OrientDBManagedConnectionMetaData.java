@@ -43,7 +43,7 @@ public class OrientDBManagedConnectionMetaData implements ManagedConnectionMetaD
 	 *             Thrown if an error occurs
 	 */
 	public String getEISProductName() throws ResourceException {
-		return "OrientDB resource adapter";
+		return "OrientDB graph resource adapter";
 	}
 
 	/**

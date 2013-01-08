@@ -17,6 +17,7 @@
 package eu.devexpert.orient.jca;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -30,7 +31,14 @@ import javax.resource.ResourceException;
 
 import org.json.JSONObject;
 
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.core.JsonParser.Feature;
+import com.fasterxml.jackson.databind.DeserializationConfig;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsonorg.JSONObjectSerializer;
 import com.orientechnologies.orient.core.cache.OLevel1RecordCache;
 import com.orientechnologies.orient.core.cache.OLevel2RecordCache;
 import com.orientechnologies.orient.core.command.OCommandRequest;
@@ -72,6 +80,18 @@ public class OrientDBConnectionImpl implements OrientDBConnection {
 	/** ManagedConnectionFactory */
 	private OrientDBManagedConnectionFactory	mcf;
 	private OGraphDatabase						graphDatabase;
+	private static ObjectMapper					mapper;
+	static {
+		mapper = new ObjectMapper().setVisibility(PropertyAccessor.FIELD, Visibility.PUBLIC_ONLY);
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		mapper.configure(DeserializationFeature.EAGER_DESERIALIZER_FETCH, true);
+		mapper.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
+		mapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
+		mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true);
+		mapper.configure(SerializationFeature.EAGER_SERIALIZER_FETCH, true);
+		// ISO8601DateFormat
+		mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS"));
+	}
 
 	/**
 	 * 
@@ -84,7 +104,7 @@ public class OrientDBConnectionImpl implements OrientDBConnection {
 	 *            OrientDBManagedConnectionFactory
 	 * @param database
 	 */
-	public OrientDBConnectionImpl(OrientDBManagedConnection mc, OrientDBManagedConnectionFactory mcf, OGraphDatabase database) {
+	public OrientDBConnectionImpl(final OrientDBManagedConnection mc, final OrientDBManagedConnectionFactory mcf, final OGraphDatabase database) {
 		this.graphDatabase = database;
 		ODatabaseRecordThreadLocal.INSTANCE.set(this.graphDatabase);
 		this.mc = mc;
@@ -564,7 +584,7 @@ public class OrientDBConnectionImpl implements OrientDBConnection {
 	}
 
 	public ODocument getNodeById(String vertexClass, Long id) throws ResourceException {
-		List<ODocument> result = (List<ODocument>) graphDatabase.command(new OSQLSynchQuery<ODocument>("select * from ? where id = ?")).execute(vertexClass, id);
+		List<ODocument> result = (List<ODocument>) graphDatabase.command(new OSQLSynchQuery<ODocument>("select * from " + vertexClass + " where id = ?")).execute(id);
 		if(result.size() > 0) {
 			return result.get(0);
 		}else {
@@ -576,9 +596,21 @@ public class OrientDBConnectionImpl implements OrientDBConnection {
 		return (List<ODocument>) graphDatabase.command(new OSQLSynchQuery<ODocument>("select * from " + vertexClass)).execute();
 	}
 
+	public ODocument saveNode(Object obj) throws ResourceException {
+		try {
+			ODocument node = createVertex(obj.getClass().getName());
+			String jsonStr = mapper.writeValueAsString(obj);
+			return node.fromJSON(jsonStr).save();
+		}
+		catch(IOException iox) {
+			throw new ResourceException();
+		}
+	}
+
 	public <T> T getNodeById(Class<T> clazz, Long id) throws ResourceException {
 		try {
-			return (new ObjectMapper()).readValue(getNodeById(clazz.getName(), id).toJSON(), clazz);
+			String jsonStr = getNodeById(clazz.getName(), id).toJSON();
+			return mapper.readValue(jsonStr, clazz);
 		}
 		catch(IOException e) {
 			throw new ResourceException();
