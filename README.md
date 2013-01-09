@@ -1,7 +1,19 @@
 ##############################
 OrientDB JCA connector by Dumitru Ciubenco
 ##############################
-version 1.1.0-SNAPSHOT
+
+Version 1.2.0
+-----------------------------------
+
+Features:
+- POJO save
+- POJO retrieve
+- Bug fixing
+- Refactoring
+- OrientDB 1.2.0 upgrade
+
+Version 1.1.0
+-----------------------------------
 
 Features:
 - OGraphDatabasePool support
@@ -10,9 +22,10 @@ Features:
 
 Tested only on JBoss 7.1.1
 
-Usage:
+Usage
+--------------------------------------
  1. Build the source code using maven
- 1. Deploy the orientdb-jca-connector-1.1.0-SNAPSHOT.rar to your jboss
+ 1. Deploy the orientdb-jca-connector-1.2.0.rar to your jboss
  1. Add resource addapter definition in your standalone.xml
 <pre>
 <code>
