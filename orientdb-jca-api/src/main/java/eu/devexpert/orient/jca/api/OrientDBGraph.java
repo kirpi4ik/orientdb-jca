@@ -46,7 +46,7 @@ import com.orientechnologies.orient.core.type.tree.OMVRBTreeRIDSet;
  * @since 0.0.1
  * @created August 05, 2012
  */
-public interface OrientDBConnection extends ODatabase {
+public interface OrientDBGraph extends ODatabase {
 
 	public <THISDB extends ODatabase> THISDB open(String iUserName, String iUserPassword);
 
@@ -337,13 +337,13 @@ public interface OrientDBConnection extends ODatabase {
 
 	public <RET extends OCommandRequest> RET command(OSQLSynchQuery<ODocument> osqlSynchQuery);
 
-	public ODocument getNodeById(String vertexClass, Long id) throws ResourceException;
+	public ODocument getNodeByField(String vertexClass, String field, Object value) throws ResourceException;
 
 	public List<ODocument> getAllNodes(String vertexClass);
-
-	public ODocument persistNode(Object obj);
 
 	public <T> T getNodeById(Class<T> clazz, Long id) throws ResourceException;
 
 	public abstract ODocument saveNode(Object obj) throws ResourceException;
+
+	public abstract <T> T getNodeByField(Class<T> clazz, String field, Object value) throws ResourceException;
 }

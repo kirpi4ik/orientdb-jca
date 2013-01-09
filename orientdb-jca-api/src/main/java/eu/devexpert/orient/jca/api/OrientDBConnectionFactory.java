@@ -28,5 +28,5 @@ import javax.resource.ResourceException;
  * @created August 05, 2012
  */
 public interface OrientDBConnectionFactory extends Serializable, Referenceable {
-	public OrientDBConnection getConnection() throws ResourceException;
+	public OrientDBGraph graph() throws ResourceException;
 }

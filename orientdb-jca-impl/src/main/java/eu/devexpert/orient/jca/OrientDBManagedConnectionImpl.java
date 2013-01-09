@@ -33,7 +33,7 @@ import javax.transaction.xa.XAResource;
 
 import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
 
-import eu.devexpert.orient.jca.api.OrientDBConnection;
+import eu.devexpert.orient.jca.api.OrientDBGraph;
 import eu.devexpert.orient.jca.api.OrientDBManagedConnection;
 import eu.devexpert.orient.jca.api.OrientDBManagedConnectionFactory;
 
@@ -51,7 +51,7 @@ public class OrientDBManagedConnectionImpl implements ManagedConnection, OrientD
 	private PrintWriter							logWriter;
 	/** Listeners */
 	private LinkedList<ConnectionEventListener>	listeners;
-	private LinkedList<OrientDBConnection>		handles;
+	private LinkedList<OrientDBGraph>		handles;
 	/** Connection */
 	private OrientDBTransactionXA				xaResource;
 	private LocalTransaction					localTransaction;
@@ -70,7 +70,7 @@ public class OrientDBManagedConnectionImpl implements ManagedConnection, OrientD
 		this.mcf = mcf;
 		this.database = oGraphDatabase;
 		this.listeners = new LinkedList<ConnectionEventListener>();
-		this.handles = new LinkedList<OrientDBConnection>();
+		this.handles = new LinkedList<OrientDBGraph>();
 		this.xaResource = new OrientDBTransactionXA(this, this.database);
 		this.localTransaction = new OrientDBTransactionLocal(this, database.getTransaction());
 	}
@@ -78,7 +78,7 @@ public class OrientDBManagedConnectionImpl implements ManagedConnection, OrientD
 	/**
 	 * Send event.
 	 */
-	private void sendEvent(int type, OrientDBConnection handle, Exception cause) {
+	private void sendEvent(int type, OrientDBGraph handle, Exception cause) {
 		ConnectionEvent event = new ConnectionEvent(this, type, cause);
 		if(handle != null) {
 			event.setConnectionHandle(handle);
@@ -90,7 +90,7 @@ public class OrientDBManagedConnectionImpl implements ManagedConnection, OrientD
 	/**
 	 * Send connection closed event.
 	 */
-	void sendClosedEvent(OrientDBConnection handle) {
+	void sendClosedEvent(OrientDBGraph handle) {
 		log.info("send-event-close");
 		sendEvent(ConnectionEvent.CONNECTION_CLOSED, handle, null);
 	}
@@ -98,7 +98,7 @@ public class OrientDBManagedConnectionImpl implements ManagedConnection, OrientD
 	/**
 	 * Send connection error event.
 	 */
-	void sendErrorEvent(OrientDBConnection handle, Exception cause) {
+	void sendErrorEvent(OrientDBGraph handle, Exception cause) {
 		log.info("send-event-error");
 		sendEvent(ConnectionEvent.CONNECTION_ERROR_OCCURRED, handle, cause);
 	}
@@ -106,7 +106,7 @@ public class OrientDBManagedConnectionImpl implements ManagedConnection, OrientD
 	/**
 	 * Send transaction committed event.
 	 */
-	void sendTxCommittedEvent(OrientDBConnection handle) {
+	void sendTxCommittedEvent(OrientDBGraph handle) {
 		log.info("send-event-tx-commited");
 		sendEvent(ConnectionEvent.LOCAL_TRANSACTION_COMMITTED, handle, null);
 	}
@@ -114,7 +114,7 @@ public class OrientDBManagedConnectionImpl implements ManagedConnection, OrientD
 	/**
 	 * Send transaction rolledback event.
 	 */
-	void sendTxRolledbackEvent(OrientDBConnection handle) {
+	void sendTxRolledbackEvent(OrientDBGraph handle) {
 		log.info("send-event-tx-rollback");
 		sendEvent(ConnectionEvent.LOCAL_TRANSACTION_ROLLEDBACK, handle, null);
 	}
@@ -122,7 +122,7 @@ public class OrientDBManagedConnectionImpl implements ManagedConnection, OrientD
 	/**
 	 * Send transaction started event.
 	 */
-	void sendTxStartedEvent(OrientDBConnection handle) {
+	void sendTxStartedEvent(OrientDBGraph handle) {
 		log.info("send-event-tx-started");
 		sendEvent(ConnectionEvent.LOCAL_TRANSACTION_STARTED, handle, null);
 	}
@@ -135,7 +135,7 @@ public class OrientDBManagedConnectionImpl implements ManagedConnection, OrientD
 	 *            The handle
 	 */
 
-	public void closeHandle(OrientDBConnection handle) {
+	public void closeHandle(OrientDBGraph handle) {
 		if(handle != null) {
 			removeHandle(handle);
 			sendClosedEvent(handle);
@@ -176,7 +176,7 @@ public class OrientDBManagedConnectionImpl implements ManagedConnection, OrientD
 
 	public void closeHandles() {
 		synchronized(handles) {
-			OrientDBConnection[] handlesArray = new OrientDBConnection[handles.size()];
+			OrientDBGraph[] handlesArray = new OrientDBGraph[handles.size()];
 			handles.toArray(handlesArray);
 			for(int i = 0; i < handlesArray.length; i++) {
 				this.closeHandle(handlesArray[i]);
@@ -190,7 +190,7 @@ public class OrientDBManagedConnectionImpl implements ManagedConnection, OrientD
 	 */
 
 	public Object getConnection(Subject subject, ConnectionRequestInfo cxRequestInfo) throws ResourceException {
-		OrientDBConnection connection = new OrientDBConnectionImpl(this, mcf, database);
+		OrientDBGraph connection = new OrientDBGraphImpl(this, mcf, database);
 		addHandle(connection);
 		return connection;
 	}
@@ -201,7 +201,7 @@ public class OrientDBManagedConnectionImpl implements ManagedConnection, OrientD
 	 */
 
 	public void associateConnection(Object connection) throws ResourceException {
-		OrientDBConnection handle = (OrientDBConnection) connection;
+		OrientDBGraph handle = (OrientDBGraph) connection;
 		if(handle.getMc() != this) {
 			handle.getMc().removeHandle(handle);
 			handle.setMc(this);
@@ -210,13 +210,13 @@ public class OrientDBManagedConnectionImpl implements ManagedConnection, OrientD
 		log.info("associateConnection()");
 	}
 
-	public void addHandle(OrientDBConnection handle) {
+	public void addHandle(OrientDBGraph handle) {
 		synchronized(handles) {
 			handles.addFirst(handle);
 		}
 	}
 
-	public void removeHandle(OrientDBConnection handle) {
+	public void removeHandle(OrientDBGraph handle) {
 		synchronized(handles) {
 			handles.addFirst(handle);
 		}

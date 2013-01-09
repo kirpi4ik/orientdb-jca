@@ -23,7 +23,7 @@ import javax.naming.Reference;
 import javax.resource.ResourceException;
 import javax.resource.spi.ConnectionManager;
 
-import eu.devexpert.orient.jca.api.OrientDBConnection;
+import eu.devexpert.orient.jca.api.OrientDBGraph;
 import eu.devexpert.orient.jca.api.OrientDBConnectionFactory;
 import eu.devexpert.orient.jca.api.OrientDBManagedConnectionFactory;
 
@@ -63,9 +63,9 @@ public class OrientDBConnectionFactoryImpl implements OrientDBConnectionFactory 
 	 * @exception ResourceException
 	 *                Thrown if a connection can't be obtained
 	 */
-	public OrientDBConnection getConnection() throws ResourceException {
-		logger.info("Get connection from ");
-		return (OrientDBConnection) txConnectionManager.allocateConnection(mcf, null);
+	public OrientDBGraph graph() throws ResourceException {
+		logger.info("Get graphDB connection");
+		return (OrientDBGraph) txConnectionManager.allocateConnection(mcf, null);
 	}
 
 	/**

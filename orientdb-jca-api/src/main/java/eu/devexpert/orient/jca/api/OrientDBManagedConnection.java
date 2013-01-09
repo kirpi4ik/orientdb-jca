@@ -183,10 +183,10 @@ public interface OrientDBManagedConnection {
 
 	public OrientDBManagedConnectionFactory getMcf();
 
-	public abstract void removeHandle(OrientDBConnection handle);
+	public abstract void removeHandle(OrientDBGraph handle);
 
-	public abstract void addHandle(OrientDBConnection handle);
+	public abstract void addHandle(OrientDBGraph handle);
 
-	public abstract void closeHandle(OrientDBConnection handle);
+	public abstract void closeHandle(OrientDBGraph handle);
 
 }

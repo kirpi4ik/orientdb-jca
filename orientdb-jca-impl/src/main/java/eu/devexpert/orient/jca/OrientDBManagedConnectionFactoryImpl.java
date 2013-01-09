@@ -30,7 +30,7 @@ import javax.resource.spi.ManagedConnection;
 import javax.resource.spi.ResourceAdapter;
 import javax.security.auth.Subject;
 
-import eu.devexpert.orient.jca.api.OrientDBConnection;
+import eu.devexpert.orient.jca.api.OrientDBGraph;
 import eu.devexpert.orient.jca.api.OrientDBConnectionFactory;
 import eu.devexpert.orient.jca.api.OrientDBManagedConnection;
 import eu.devexpert.orient.jca.api.OrientDBManagedConnectionFactory;
@@ -48,8 +48,8 @@ import com.orientechnologies.orient.core.exception.OStorageException;
 @ConnectionDefinition(
 	connectionFactory = OrientDBConnectionFactory.class, 
 	connectionFactoryImpl = OrientDBConnectionFactoryImpl.class, 
-	connection = OrientDBConnection.class,
-	connectionImpl = OrientDBConnectionImpl.class)
+	connection = OrientDBGraph.class,
+	connectionImpl = OrientDBGraphImpl.class)
 public class OrientDBManagedConnectionFactoryImpl implements OrientDBManagedConnectionFactory {
 	private static final long		serialVersionUID	= 1L;
 	private static Logger			logger				= Logger.getLogger(OrientDBManagedConnectionFactoryImpl.class.getName());

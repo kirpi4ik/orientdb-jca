@@ -29,16 +29,11 @@ import java.util.logging.Logger;
 
 import javax.resource.ResourceException;
 
-import org.json.JSONObject;
-
-import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.core.JsonParser.Feature;
-import com.fasterxml.jackson.databind.DeserializationConfig;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsonorg.JSONObjectSerializer;
 import com.orientechnologies.orient.core.cache.OLevel1RecordCache;
 import com.orientechnologies.orient.core.cache.OLevel2RecordCache;
 import com.orientechnologies.orient.core.command.OCommandRequest;
@@ -62,7 +57,7 @@ import com.orientechnologies.orient.core.storage.OStorage;
 import com.orientechnologies.orient.core.storage.OStorage.CLUSTER_TYPE;
 import com.orientechnologies.orient.core.type.tree.OMVRBTreeRIDSet;
 
-import eu.devexpert.orient.jca.api.OrientDBConnection;
+import eu.devexpert.orient.jca.api.OrientDBGraph;
 import eu.devexpert.orient.jca.api.OrientDBManagedConnection;
 import eu.devexpert.orient.jca.api.OrientDBManagedConnectionFactory;
 
@@ -72,9 +67,9 @@ import eu.devexpert.orient.jca.api.OrientDBManagedConnectionFactory;
  * @since 0.0.1
  * @created August 05, 2012
  */
-public class OrientDBConnectionImpl implements OrientDBConnection {
+public class OrientDBGraphImpl implements OrientDBGraph {
 	/** The logger */
-	private static Logger						log	= Logger.getLogger(OrientDBConnectionImpl.class.getName());
+	private static Logger						log	= Logger.getLogger(OrientDBGraphImpl.class.getName());
 	/** ManagedConnection */
 	private OrientDBManagedConnection			mc;
 	/** ManagedConnectionFactory */
@@ -104,7 +99,7 @@ public class OrientDBConnectionImpl implements OrientDBConnection {
 	 *            OrientDBManagedConnectionFactory
 	 * @param database
 	 */
-	public OrientDBConnectionImpl(final OrientDBManagedConnection mc, final OrientDBManagedConnectionFactory mcf, final OGraphDatabase database) {
+	public OrientDBGraphImpl(final OrientDBManagedConnection mc, final OrientDBManagedConnectionFactory mcf, final OGraphDatabase database) {
 		this.graphDatabase = database;
 		ODatabaseRecordThreadLocal.INSTANCE.set(this.graphDatabase);
 		this.mc = mc;
@@ -583,15 +578,17 @@ public class OrientDBConnectionImpl implements OrientDBConnection {
 		return graphDatabase.command(osqlSynchQuery);
 	}
 
-	public ODocument getNodeById(String vertexClass, Long id) throws ResourceException {
-		List<ODocument> result = (List<ODocument>) graphDatabase.command(new OSQLSynchQuery<ODocument>("select * from " + vertexClass + " where id = ?")).execute(id);
-		if(result.size() > 0) {
+	@SuppressWarnings("unchecked")
+	public ODocument getNodeByField(String vertexClass, String field, Object value) throws ResourceException {
+		List<ODocument> result = (List<ODocument>) graphDatabase.command(new OSQLSynchQuery<ODocument>("select * from " + vertexClass + " where " + field + " = ?")).execute(value);
+		if (result.size() > 0) {
 			return result.get(0);
-		}else {
+		} else {
 			return null;
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<ODocument> getAllNodes(String vertexClass) {
 		return (List<ODocument>) graphDatabase.command(new OSQLSynchQuery<ODocument>("select * from " + vertexClass)).execute();
 	}
@@ -600,6 +597,7 @@ public class OrientDBConnectionImpl implements OrientDBConnection {
 		try {
 			ODocument node = createVertex(obj.getClass().getName());
 			String jsonStr = mapper.writeValueAsString(obj);
+			log.info("Save POJO : " + jsonStr);
 			return node.fromJSON(jsonStr).save();
 		}
 		catch(IOException iox) {
@@ -609,7 +607,8 @@ public class OrientDBConnectionImpl implements OrientDBConnection {
 
 	public <T> T getNodeById(Class<T> clazz, Long id) throws ResourceException {
 		try {
-			String jsonStr = getNodeById(clazz.getName(), id).toJSON();
+			String jsonStr = getNodeByField(clazz.getName(), "id", id).toJSON();
+			log.info("Get POJO by id : " + jsonStr);
 			return mapper.readValue(jsonStr, clazz);
 		}
 		catch(IOException e) {
@@ -617,8 +616,15 @@ public class OrientDBConnectionImpl implements OrientDBConnection {
 		}
 	}
 
-	public ODocument persistNode(Object obj) {
-		ODocument node = createVertex(obj.getClass().getName());
-		return node.fromJSON((new JSONObject(obj)).toString()).save();
+	@Override
+	public <T> T getNodeByField(Class<T> clazz, String field, Object value) throws ResourceException {
+		try {
+			String jsonStr = getNodeByField(clazz.getName(), field, value).toJSON();
+			log.info("Get POJO by field : " + jsonStr);
+			return mapper.readValue(jsonStr, clazz);
+		}
+		catch(IOException e) {
+			throw new ResourceException();
+		}
 	}
 }
