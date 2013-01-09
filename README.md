@@ -97,7 +97,7 @@ Usage
   	&lt;dependency&gt;
 			&lt;groupId&gt;eu.devexpert&lt;/groupId&gt;
 			&lt;artifactId&gt;orientdb-jca-api&lt;/artifactId&gt;
-			&lt;version&gt;1.2.0-SNAPSHOT&lt;/version&gt;
+			&lt;version&gt;1.3.0&lt;/version&gt;
 		&lt;/dependency&gt;
 		&lt;dependency&gt;
 			&lt;groupId&gt;org.jboss.ironjacamar&lt;/groupId&gt;
