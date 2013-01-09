@@ -671,4 +671,14 @@ public class OrientDBGraphImpl implements OrientDBGraph {
 			throw new ResourceException(iox.getMessage());
 		}
 	}
+
+	@Override
+	public long countClusterElements(int iClusterId, boolean countTombstones) {
+		return graphDatabase.countClusterElements(iClusterId, countTombstones);
+	}
+
+	@Override
+	public long countClusterElements(int[] iClusterIds, boolean countTombstones) {
+		return graphDatabase.countClusterElements(iClusterIds, countTombstones);
+	}
 }
