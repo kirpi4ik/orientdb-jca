@@ -8,7 +8,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>eu.devexpert</groupId>
 	<artifactId>orientdb-jca-parent</artifactId>
-	<version>1.2.0-SNAPSHOT</version>
+	<version>1.2.0</version>
 	<packaging>pom</packaging>
 	<modules>
 		<module>orientdb-jca-api</module>
@@ -16,17 +16,17 @@
 		<module>orientdb-jca-connector</module>
 	</modules>
 	<properties>
-		<version.orientdb-jca>1.2.0-SNAPSHOT</version.orientdb-jca>
+		<version.orientdb-jca>1.2.0</version.orientdb-jca>
 		<version.orientdb>1.2.0</version.orientdb>
 	</properties>
 	<distributionManagement>
 		<repository>
-			<id>devexpert</id>
+			<id>devexpert.release</id>
 			<name>RepositoryProxy</name>
 			<url>http://nexus.devexpert.eu/content/repositories/releases</url>
 		</repository>
 		<snapshotRepository>
-			<id>devexpert</id>
+			<id>devexpert.snapshot</id>
 			<name>RepositoryProxy</name>
 			<url>http://nexus.devexpert.eu/content/repositories/snapshots</url>
 		</snapshotRepository>

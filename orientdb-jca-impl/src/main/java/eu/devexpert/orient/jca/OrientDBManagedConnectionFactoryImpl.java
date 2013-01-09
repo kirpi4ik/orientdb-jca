@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.annotation.PostConstruct;
 import javax.resource.ResourceException;
 import javax.resource.spi.ConfigProperty;
 import javax.resource.spi.ConnectionDefinition;
@@ -30,14 +31,15 @@ import javax.resource.spi.ManagedConnection;
 import javax.resource.spi.ResourceAdapter;
 import javax.security.auth.Subject;
 
-import eu.devexpert.orient.jca.api.OrientDBGraph;
-import eu.devexpert.orient.jca.api.OrientDBConnectionFactory;
-import eu.devexpert.orient.jca.api.OrientDBManagedConnection;
-import eu.devexpert.orient.jca.api.OrientDBManagedConnectionFactory;
-
+import com.orientechnologies.orient.core.config.OGlobalConfiguration;
 import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
 import com.orientechnologies.orient.core.db.graph.OGraphDatabasePool;
 import com.orientechnologies.orient.core.exception.OStorageException;
+
+import eu.devexpert.orient.jca.api.OrientDBConnectionFactory;
+import eu.devexpert.orient.jca.api.OrientDBGraph;
+import eu.devexpert.orient.jca.api.OrientDBManagedConnection;
+import eu.devexpert.orient.jca.api.OrientDBManagedConnectionFactory;
 
 /**
  * 
@@ -46,15 +48,16 @@ import com.orientechnologies.orient.core.exception.OStorageException;
  * @created August 05, 2012
  */
 @ConnectionDefinition(
-	connectionFactory = OrientDBConnectionFactory.class, 
-	connectionFactoryImpl = OrientDBConnectionFactoryImpl.class, 
-	connection = OrientDBGraph.class,
+	connectionFactory = OrientDBConnectionFactory.class, connectionFactoryImpl = OrientDBConnectionFactoryImpl.class, connection = OrientDBGraph.class,
 	connectionImpl = OrientDBGraphImpl.class)
 public class OrientDBManagedConnectionFactoryImpl implements OrientDBManagedConnectionFactory {
 	private static final long		serialVersionUID	= 1L;
 	private static Logger			logger				= Logger.getLogger(OrientDBManagedConnectionFactoryImpl.class.getName());
 	private OrientDBResourceAdapter	ra;
 	private PrintWriter				logwriter;
+	private int						connectionsCreated	= 0;
+	private OGraphDatabasePool		databasePool;
+
 	@ConfigProperty(type = String.class, defaultValue = "local:../databases/temp-orientdb")
 	private String					connectionUrl;
 	@ConfigProperty(type = String.class, defaultValue = "admin")
@@ -63,11 +66,32 @@ public class OrientDBManagedConnectionFactoryImpl implements OrientDBManagedConn
 	private String					password;
 	@ConfigProperty(defaultValue = "true")
 	private boolean					xa;
-	private int						connectionsCreated	= 0;
-	private OGraphDatabasePool		databasePool;
+	@ConfigProperty(defaultValue = "false")
+	private Boolean					configDump;
+	@ConfigProperty(defaultValue = "false")
+	private Boolean					configProfiler;
+	@ConfigProperty(defaultValue = "info")
+	private String					configConsoleLevel;
+	@ConfigProperty(defaultValue = "info")
+	private String					configFileLevel;
+	@ConfigProperty(defaultValue = "3")
+	private Integer					configPoolMinSize;
+	@ConfigProperty(defaultValue = "20")
+	private Integer					configPoolMaxSize;
+	@ConfigProperty(defaultValue = "utf8")
+	private String					configEncoding;
 
 	public OrientDBManagedConnectionFactoryImpl() {
 		this.logwriter = new PrintWriter(System.out);
+	}
+
+	@PostConstruct
+	private void initialize() {
+		OGlobalConfiguration.ENVIRONMENT_DUMP_CFG_AT_STARTUP.setValue(configDump);
+		OGlobalConfiguration.PROFILER_ENABLED.setValue(configProfiler);
+		OGlobalConfiguration.LOG_CONSOLE_LEVEL.setValue(configConsoleLevel);
+		OGlobalConfiguration.LOG_FILE_LEVEL.setValue(configFileLevel);
+		OGlobalConfiguration.NETWORK_HTTP_CONTENT_CHARSET.setValue(configEncoding);
 	}
 
 	/*
@@ -76,7 +100,7 @@ public class OrientDBManagedConnectionFactoryImpl implements OrientDBManagedConn
 	 */
 	public void start() {
 		databasePool = new OGraphDatabasePool(connectionUrl, username, password);
-		databasePool.setup(3, 20);
+		databasePool.setup(configPoolMinSize, configPoolMaxSize);
 		try {
 			databasePool.acquire();
 		}
@@ -235,6 +259,34 @@ public class OrientDBManagedConnectionFactoryImpl implements OrientDBManagedConn
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public void setConfigConsoleLevel(String configConsoleLevel) {
+		this.configConsoleLevel = configConsoleLevel;
+	}
+
+	public void setConfigDump(Boolean configDump) {
+		this.configDump = configDump;
+	}
+
+	public void setConfigEncoding(String configEncoding) {
+		this.configEncoding = configEncoding;
+	}
+
+	public void setConfigFileLevel(String configFileLevel) {
+		this.configFileLevel = configFileLevel;
+	}
+
+	public void setConfigPoolMaxSize(Integer configPoolMaxSize) {
+		this.configPoolMaxSize = configPoolMaxSize;
+	}
+
+	public void setConfigPoolMinSize(Integer configPoolMinSize) {
+		this.configPoolMinSize = configPoolMinSize;
+	}
+
+	public void setConfigProfiler(Boolean configProfiler) {
+		this.configProfiler = configProfiler;
 	}
 
 	/*

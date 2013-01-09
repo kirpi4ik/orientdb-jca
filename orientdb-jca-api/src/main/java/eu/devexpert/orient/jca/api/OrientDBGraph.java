@@ -346,4 +346,8 @@ public interface OrientDBGraph extends ODatabase {
 	public abstract ODocument saveNode(Object obj) throws ResourceException;
 
 	public abstract <T> T getNodeByField(Class<T> clazz, String field, Object value) throws ResourceException;
+
+	public List<ODocument> getNodesByFields(Object obj, String... constraints) throws ResourceException;
+
+	public void saveOrUpdateNode(Object obj, String... constraints) throws ResourceException;
 }

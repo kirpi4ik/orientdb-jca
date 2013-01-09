@@ -17,6 +17,7 @@
 package eu.devexpert.orient.jca;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Iterator;
@@ -581,9 +582,9 @@ public class OrientDBGraphImpl implements OrientDBGraph {
 	@SuppressWarnings("unchecked")
 	public ODocument getNodeByField(String vertexClass, String field, Object value) throws ResourceException {
 		List<ODocument> result = (List<ODocument>) graphDatabase.command(new OSQLSynchQuery<ODocument>("select * from " + vertexClass + " where " + field + " = ?")).execute(value);
-		if (result.size() > 0) {
+		if(result.size() > 0) {
 			return result.get(0);
-		} else {
+		}else {
 			return null;
 		}
 	}
@@ -625,6 +626,49 @@ public class OrientDBGraphImpl implements OrientDBGraph {
 		}
 		catch(IOException e) {
 			throw new ResourceException();
+		}
+	}
+
+	public List<ODocument> getNodesByFields(Object obj, String... constraints) throws ResourceException {
+		try {
+			Object[] values = new Object[constraints.length];
+			StringBuffer query = new StringBuffer("select * from ");
+			query.append(obj.getClass().getName());
+			query.append(" where ");
+			int counter = 0;
+			for(String attributeName : constraints) {
+				values[counter] = BeanUtils.getObjectAttribute(obj, attributeName);
+				query.append(attributeName);
+				query.append(" = ? ");
+				if(++counter < constraints.length) {
+					query.append("and ");
+				}
+			}
+
+			return (List<ODocument>) graphDatabase.command(new OSQLSynchQuery<ODocument>(query.toString())).execute(values);
+		}
+		catch(NoSuchMethodException | InvocationTargetException | IllegalAccessException ie) {
+			throw new ResourceException(ie.getMessage());
+		}
+	}
+
+	@Override
+	public void saveOrUpdateNode(Object obj, String... constraints) throws ResourceException {
+		try {
+			List<ODocument> existingNodes = getNodesByFields(obj, constraints);
+			if(existingNodes.size() == 0) {
+				saveNode(obj);
+			}else if(existingNodes.size() == 1) {
+				ODocument node = existingNodes.get(0);
+				String jsonStr = mapper.writeValueAsString(obj);
+				node.fromJSON(jsonStr).save();
+			}else {
+				throw new ResourceException("You have to pass unique fields, otherwise it is not possible to update the node, now we have found more nodes with your criteria : "
+						+ existingNodes.size());
+			}
+		}
+		catch(IOException iox) {
+			throw new ResourceException(iox.getMessage());
 		}
 	}
 }
