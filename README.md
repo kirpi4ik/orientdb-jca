@@ -1,4 +1,4 @@
-author Dumitru Ciubenco
+Author : Dumitru Ciubenco
 ##############################
 ## OrientDB JCA connector 
 ##############################
