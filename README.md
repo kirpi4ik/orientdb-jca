@@ -91,7 +91,7 @@ Usage
 </code>
 </pre>
 
- 1. Add the deployment dependency to your(pom.xml if you are using maven) or to the MANIFEST.MF: deployment.orientdb-jca-connector-1.1.0-SNAPSHOT.rar
+ 1. Add the deployment dependency to your(pom.xml if you are using maven) or to the MANIFEST.MF: deployment.orientdb-jca-connector-1.3.0-SNAPSHOT.rar
  1. Add the dependency to your project:
 <pre>
 <code>
