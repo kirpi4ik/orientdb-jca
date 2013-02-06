@@ -68,9 +68,9 @@ public interface OrientDBGraph extends ODatabase {
 
 	public ODocument createEdge(ORID iSourceVertexRid, ORID iDestVertexRid, String iClassName);
 
-	public void removeVertex(ODocument iVertex);
+	public void removeVertex(OIdentifiable iVertex);
 
-	public void removeEdge(ODocument iEdge);
+	public void removeEdge(OIdentifiable iEdge);
 
 	public ODocument createEdge(ODocument iSourceVertex, ODocument iDestVertex);
 
@@ -343,11 +343,29 @@ public interface OrientDBGraph extends ODatabase {
 
 	public <T> T getNodeById(Class<T> clazz, Long id) throws ResourceException;
 
+	/**
+	 * Save the NEW object as json-serialized node in the graph
+	 * 
+	 * @param obj
+	 *            - java bean object
+	 * @return - saved node
+	 * @throws ResourceException
+	 */
 	public abstract ODocument saveNode(Object obj) throws ResourceException;
 
 	public abstract <T> T getNodeByField(Class<T> clazz, String field, Object value) throws ResourceException;
 
 	public List<ODocument> getNodesByFields(Object obj, String... constraints) throws ResourceException;
 
+	/**
+	 * Save New object or update the node if it is already exist in the graph.
+	 * 
+	 * @param obj
+	 *            - java bean object to persist
+	 * @param constraints
+	 *            - array with the fields which MUST be unique with AND operator. <br/>
+	 *            E.g: <code> saveOrUpdateNode(user,"id","username");// where (id AND name) are unique fields</code>
+	 * @throws ResourceException
+	 */
 	public void saveOrUpdateNode(Object obj, String... constraints) throws ResourceException;
 }

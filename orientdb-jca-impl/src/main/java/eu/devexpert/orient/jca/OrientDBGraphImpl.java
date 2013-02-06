@@ -339,11 +339,11 @@ public class OrientDBGraphImpl implements OrientDBGraph {
 		return graphDatabase.createEdge(iSourceVertexRid, iDestVertexRid, iClassName);
 	}
 
-	public void removeVertex(ODocument iVertex) {
+	public void removeVertex(OIdentifiable iVertex) {
 		graphDatabase.removeVertex(iVertex);
 	}
 
-	public void removeEdge(ODocument iEdge) {
+	public void removeEdge(OIdentifiable iEdge) {
 		graphDatabase.removeEdge(iEdge);
 
 	}
