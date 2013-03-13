@@ -19,6 +19,9 @@
 	</parent>
 	<artifactId>orientdb-jca-impl</artifactId>
 	<packaging>jar</packaging>
+  <properties>
+    <sonar.language>java</sonar.language>
+  </properties>	
 	<dependencies>
 		<dependency>
 			<groupId>eu.devexpert</groupId>
