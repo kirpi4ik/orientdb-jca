@@ -17,7 +17,7 @@
 	</modules>
 	<properties>
 		<version.orientdb-jca>1.3.0-SNAPSHOT</version.orientdb-jca>
-		<version.orientdb>1.3.0</version.orientdb>
+		<version.orientdb>2.2.23</version.orientdb>
 	</properties>
 
 	<distributionManagement>
